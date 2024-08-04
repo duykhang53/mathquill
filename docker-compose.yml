@@ -1,0 +1,46 @@
+name: math-quill_build
+version: '3'
+
+services:
+  mathquill-build:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM node:18
+        RUN apt install -y make
+
+        WORKDIR /mathquill
+
+        RUN git init
+        ADD .gitignore .
+
+        ADD package*.json .
+        RUN npm ci
+
+        ADD ./script ./script
+        RUN find ./script -type f -exec grep -qIP '\r\n' {} ';' -exec perl -pi -e 's/\r\n/\n/g' {} '+'
+
+        ADD ./src ./src
+        ADD Makefile .
+        RUN sed -i -e 's/\r\n/\n/g' Makefile
+
+        RUN NO_INSTALL=1 make all
+
+        COPY <<EOF docker-start.sh
+        #!/bin/bash
+
+        mkdir -p dist/build
+        cp -r build/* dist/build/
+        cp package.json dist/
+        (cd dist && npm pack)
+        echo Build complete!
+        # sleep 10000s
+        EOF
+        RUN sed -i -e 's/\r\n/\n/g' docker-start.sh && chmod +x docker-start.sh
+
+        CMD ./docker-start.sh
+    # deploy:
+    #   replicas: 0
+    volumes:
+      - ./build/:/mathquill/dist/
+        
