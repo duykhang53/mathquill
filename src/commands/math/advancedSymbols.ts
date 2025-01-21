@@ -138,12 +138,12 @@ LatexCmds.mathbb = class extends MathCommand {
     return optWhitespace
       .then(string('{'))
       .then(optWhitespace)
-      .then(regex(/^[NPZQRCHE]/))
+      .then(regex(/^[A-Z]/))
       .skip(optWhitespace)
       .skip(string('}'))
       .map(function (c) {
         // instantiate the class for the matching char
-        var cmd = LatexCmds[c];
+        var cmd = LatexCmds[c] || LatexCmds['blackbold_' + c];
         if (isMQNodeClass(cmd)) {
           return new cmd();
         } else {
@@ -202,6 +202,39 @@ LatexCmds.E =
   LatexCmds.expectation =
   LatexCmds.Expectation =
     bindVanillaSymbol('\\mathbb{E}', '&#x1D53C;', 'expectation');
+
+[
+  '1D538',
+  '1D539',
+  '2102',
+  '1D53B',
+  '1D53C',
+  '1D53D',
+  '1D53E',
+  '210D',
+  '1D540',
+  '1D541',
+  '1D542',
+  '1D543',
+  '1D544',
+  '2115',
+  '1D546',
+  '2119',
+  '211A',
+  '211D',
+  '1D54A',
+  '1D54B',
+  '1D54C',
+  '1D54D',
+  '1D54E',
+  '1D54F',
+  '1D550',
+  '2124',
+].forEach((code, idx) => {
+  const char = String.fromCharCode('A'.charCodeAt(0) + idx);
+
+  LatexCmds['blackbold_' + char] = LatexCmds[char] || bindVanillaSymbol(`\\mathbb{${char}}`, `&#x${code};`, `blackbold ${char}`);
+});
 
 //spacing
 LatexCmds.quad = LatexCmds.emsp = bindVanillaSymbol(
