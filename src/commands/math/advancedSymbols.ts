@@ -138,7 +138,7 @@ LatexCmds.mathbb = class extends MathCommand {
     return optWhitespace
       .then(string('{'))
       .then(optWhitespace)
-      .then(regex(/^[NPZQRCH]/))
+      .then(regex(/^[NPZQRCHE]/))
       .skip(optWhitespace)
       .skip(string('}'))
       .map(function (c) {
@@ -197,6 +197,11 @@ LatexCmds.H =
   LatexCmds.quaternions =
   LatexCmds.Quaternions =
     bindVanillaSymbol('\\mathbb{H}', '&#8461;', 'quaternions');
+
+LatexCmds.E = 
+  LatexCmds.expectation =
+  LatexCmds.Expectation =
+    bindVanillaSymbol('\\mathbb{E}', '&#x1D53C;', 'expectation');
 
 //spacing
 LatexCmds.quad = LatexCmds.emsp = bindVanillaSymbol(

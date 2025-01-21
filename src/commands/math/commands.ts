@@ -130,6 +130,8 @@ LatexCmds.mathsf = () =>
   new Style('\\mathsf', 'span', 'class="mq-sans-serif mq-font"', 'Serif Font');
 LatexCmds.mathtt = () =>
   new Style('\\mathtt', 'span', 'class="mq-monospace mq-font"', 'Math Text');
+LatexCmds.mathcal = () =>
+  new Style('\\mathcal', 'span', 'class="mq-calligraphy mq-font"', 'Calligraphic Text');
 //text-decoration
 LatexCmds.underline = () =>
   new Style(
