@@ -302,10 +302,10 @@ class Controller_latex extends Controller_keystroke {
     var all = Parser.all;
     var eof = Parser.eof;
 
-    var block = latexMathParser
-      .skip(eof)
-      .or(all.result<false>(false))
-      .parse(latex);
+    const createBlock = (newLatex: string) =>
+      latexMathParser.skip(eof).or(all.result<false>(false)).parse(newLatex);
+
+    var block = createBlock(latex);
 
     root.ends[L] = root.ends[R] = 0;
 
@@ -315,14 +315,84 @@ class Controller_latex extends Controller_keystroke {
 
     var jQ = root.jQ;
 
-    if (block) {
-      var html = block.join('html');
-      jQ.html(html);
-      root.jQize(jQ.children());
-      root.finalizeInsert(cursor.options, cursor);
-    } else {
-      jQ.empty();
-    }
+    const setJQBody = (html?: string | JQSelector) => {
+      if (html) {
+        if (typeof html === 'string') {
+          jQ.html(html);
+        } else {
+          jQ.empty().append(html);
+        }
+
+        root.jQize(jQ.children());
+        root.finalizeInsert(cursor.options, cursor);
+      } else {
+        jQ.empty();
+      }
+    };
+
+    setJQBody(
+      (() => {
+        if (block) {
+          return block.join('html');
+        }
+
+        if (latex && this['renderFailedLatex' as never]) {
+          const failedLatex = (this['renderFailedLatex' as never] as any)(
+            latex
+          );
+
+          if (!failedLatex) {
+            return;
+          }
+
+          const renderMQNode = (node: MQNode) => {
+            let block: MathBlock;
+
+            if (node instanceof MathBlock) {
+              block = node;
+            } else {
+              block = new MathBlock();
+              node.adopt(block, 0, 0);
+            }
+
+            block.children().adopt(root, 0, 0);
+
+            return block.join('html');
+          };
+
+          if (failedLatex instanceof MQNode) {
+            return renderMQNode(failedLatex);
+          }
+
+          if (failedLatex.latex) {
+            const newBlock = createBlock(failedLatex.latex);
+
+            if (newBlock) {
+              return renderMQNode(newBlock);
+            }
+          }
+
+          if (failedLatex.html) {
+            return renderMQNode(
+              new (class extends MathElement {
+                html() {
+                  return failedLatex.html;
+                }
+                text() {
+                  return latex;
+                }
+                latex() {
+                  return latex;
+                }
+              })()
+            );
+          }
+        }
+
+        return;
+      })()
+    );
+
     this.updateMathspeak();
     delete cursor.selection;
     cursor.insAtRightEnd(root);
