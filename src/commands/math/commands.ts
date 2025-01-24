@@ -131,7 +131,14 @@ LatexCmds.mathsf = () =>
 LatexCmds.mathtt = () =>
   new Style('\\mathtt', 'span', 'class="mq-monospace mq-font"', 'Math Text');
 LatexCmds.mathcal = () =>
-  new Style('\\mathcal', 'span', 'class="mq-calligraphy mq-font"', 'Calligraphic Text');
+  new Style(
+    '\\mathcal',
+    'span',
+    'class="mq-calligraphy mq-font"',
+    'Calligraphic Text'
+  );
+LatexCmds.mathfrak = () =>
+  new Style('\\mathfrak', 'span', 'class="mq-fraktur mq-font"', 'Fraktur Text');
 //text-decoration
 LatexCmds.underline = () =>
   new Style(
