@@ -1549,3 +1549,8 @@ class EmbedNode extends MQSymbol {
   }
 }
 LatexCmds.embed = EmbedNode;
+
+LatexCmds.tag = () =>
+  new Style('\\tag', 'var', 'style="display:none"', 'LaTeX Tag');
+LatexCmds.label = () =>
+  new Style('\\label', 'var', 'style="display:none"', 'LaTeX Label');

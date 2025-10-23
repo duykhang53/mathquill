@@ -138,7 +138,7 @@ LatexCmds.mathbb = class extends MathCommand {
     return optWhitespace
       .then(string('{'))
       .then(optWhitespace)
-      .then(regex(/^[A-Z]/))
+      .then(regex(/^[A-Za-z0-9]/))
       .skip(optWhitespace)
       .skip(string('}'))
       .map(function (c) {
@@ -153,57 +153,42 @@ LatexCmds.mathbb = class extends MathCommand {
   }
 };
 
-LatexCmds.N =
-  LatexCmds.naturals =
-  LatexCmds.Naturals =
-    bindVanillaSymbol('\\mathbb{N}', '&#8469;', 'naturals');
+function registerBlackBold(baseChar: string, ary: string[]) {
+  const baseCharCode = baseChar.charCodeAt(0);
 
-LatexCmds.P =
-  LatexCmds.primes =
-  LatexCmds.Primes =
-  LatexCmds.projective =
-  LatexCmds.Projective =
-  LatexCmds.probability =
-  LatexCmds.Probability =
-    bindVanillaSymbol('\\mathbb{P}', '&#8473;', 'P');
+  ary.forEach((code, idx) => {
+    const char = String.fromCharCode(baseCharCode + idx);
+    LatexCmds['blackbold_' + char] =
+      LatexCmds[char] ||
+      bindVanillaSymbol(
+        `\\mathbb{${char}}`,
+        `&#x${code};`,
+        {
+          N: 'naturals',
+          Z: 'integers',
+          Q: 'rationals',
+          R: 'reals',
+          C: 'complexes',
+          H: 'quaternions',
+          E: 'expectation',
+        }[char] || `blackbold ${char}`
+      );
+  });
+}
 
-LatexCmds.Z =
-  LatexCmds.integers =
-  LatexCmds.Integers =
-    bindVanillaSymbol('\\mathbb{Z}', '&#8484;', 'integers');
-
-LatexCmds.Q =
-  LatexCmds.rationals =
-  LatexCmds.Rationals =
-    bindVanillaSymbol('\\mathbb{Q}', '&#8474;', 'rationals');
-
-LatexCmds.R =
-  LatexCmds.reals =
-  LatexCmds.Reals =
-    bindVanillaSymbol('\\mathbb{R}', '&#8477;', 'reals');
-
-LatexCmds.C =
-  LatexCmds.complex =
-  LatexCmds.Complex =
-  LatexCmds.complexes =
-  LatexCmds.Complexes =
-  LatexCmds.complexplane =
-  LatexCmds.Complexplane =
-  LatexCmds.ComplexPlane =
-    bindVanillaSymbol('\\mathbb{C}', '&#8450;', 'complexes');
-
-LatexCmds.H =
-  LatexCmds.Hamiltonian =
-  LatexCmds.quaternions =
-  LatexCmds.Quaternions =
-    bindVanillaSymbol('\\mathbb{H}', '&#8461;', 'quaternions');
-
-LatexCmds.E = 
-  LatexCmds.expectation =
-  LatexCmds.Expectation =
-    bindVanillaSymbol('\\mathbb{E}', '&#x1D53C;', 'expectation');
-
-[
+registerBlackBold(
+  '0',
+  new Array(10)
+    .fill('')
+    .map((_, i) => (parseInt('1D7D8', 16) + i).toString(16).toUpperCase())
+);
+registerBlackBold(
+  'a',
+  new Array(26)
+    .fill('')
+    .map((_, i) => (parseInt('1D552', 16) + i).toString(16).toUpperCase())
+);
+registerBlackBold('A', [
   '1D538',
   '1D539',
   '2102',
@@ -230,19 +215,76 @@ LatexCmds.E =
   '1D54F',
   '1D550',
   '2124',
-].forEach((code, idx) => {
-  const char = String.fromCharCode('A'.charCodeAt(0) + idx);
+]);
 
-  LatexCmds['blackbold_' + char] = LatexCmds[char] || bindVanillaSymbol(`\\mathbb{${char}}`, `&#x${code};`, `blackbold ${char}`);
-});
+LatexCmds.N = LatexCmds.naturals = LatexCmds.Naturals = LatexCmds.blackbold_N;
+
+LatexCmds.P =
+  LatexCmds.primes =
+  LatexCmds.Primes =
+  LatexCmds.projective =
+  LatexCmds.Projective =
+  LatexCmds.probability =
+  LatexCmds.Probability =
+    LatexCmds.blackbold_P;
+
+LatexCmds.Z = LatexCmds.integers = LatexCmds.Integers = LatexCmds.blackbold_Z;
+
+LatexCmds.Q = LatexCmds.rationals = LatexCmds.Rationals = LatexCmds.blackbold_Q;
+
+LatexCmds.R = LatexCmds.reals = LatexCmds.Reals = LatexCmds.blackbold_R;
+
+LatexCmds.C =
+  LatexCmds.complex =
+  LatexCmds.Complex =
+  LatexCmds.complexes =
+  LatexCmds.Complexes =
+  LatexCmds.complexplane =
+  LatexCmds.Complexplane =
+  LatexCmds.ComplexPlane =
+    LatexCmds.blackbold_C;
+
+LatexCmds.H =
+  LatexCmds.Hamiltonian =
+  LatexCmds.quaternions =
+  LatexCmds.Quaternions =
+    LatexCmds.blackbold_H;
+
+LatexCmds.E =
+  LatexCmds.expectation =
+  LatexCmds.Expectation =
+    LatexCmds.blackbold_E;
 
 //spacing
-LatexCmds.quad = LatexCmds.emsp = bindVanillaSymbol(
-  '\\quad ',
-  '    ',
-  '4 spaces'
-);
-LatexCmds.qquad = bindVanillaSymbol('\\qquad ', '        ', '8 spaces');
+(
+  [
+    [',', 1 / 6],
+    [':', 2 / 9],
+    [';', 5 / 18],
+    ['!', -1 / 6],
+    ['quad', 1],
+    ['qquad', 2],
+  ] as [string, number, string?][]
+).forEach(([cmd, size, desc]) => {
+  const ltCmd =
+    (LatexCmds[cmd] =
+    LatexCmds[`space_${cmd}`] =
+      () =>
+        new MQSymbol(
+          `\\${cmd} `,
+          `<span style="margin-right:${size.toFixed(3)}em"></span>`,
+          desc || `LaTeX ${cmd} space`
+        ));
+
+  if (/^\w+$/.test(cmd)) LatexCmds[cmd] = ltCmd;
+  if (cmd === 'quad') LatexCmds.emsp = ltCmd;
+});
+// LatexCmds.quad = LatexCmds.emsp = bindVanillaSymbol(
+//   '\\quad ',
+//   '    ',
+//   '4 spaces'
+// );
+// LatexCmds.qquad = bindVanillaSymbol('\\qquad ', '        ', '8 spaces');
 /* spacing special characters, gonna have to implement this in LatexCommandInput::onText somehow
 case ',':
   return VanillaSymbol('\\, ',' ', 'comma');
